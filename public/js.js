@@ -16,11 +16,7 @@ const elements = (function(w, d, $) {
 })(window, document, jQuery);
 
 function onmessage(event) {
-	data.msgList.push({
-		text: event.data,
-		class: 'list-group-item list-group-item--server',
-	});
-	console.log('message', event);
+	data.msgList = JSON.parse(event.data);
 }
 
 function onopen(event) {
@@ -58,7 +54,7 @@ function render() {
 	elements.msgList.html(
 		data.msgList
 			.map(function(item) {
-				return `<li class="${item.class}">${item.text}</li>`;
+				return `<li class="list-group-item">${item}</li>`;
 			})
 			.join(''),
 	);
@@ -66,11 +62,10 @@ function render() {
 
 function trigger(d, e) {
 	e.msgSend.click(function() {
-		d.msgList.push({
-			class: 'list-group-item list-group-item--client',
-			text: e.msgInput.val(),
-		});
+		if (!e.msgInput.val()) return;
 		socket.send(e.msgInput.val());
+		e.msgInput.val('');
+		e.msgInput.focus();
 	});
 }
 
